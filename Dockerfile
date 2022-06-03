@@ -1,3 +1,5 @@
 FROM node:alpine
+WORKDIR /usr/app
 COPY . .
-CMD node app.js
+RUN npm ci
+CMD ["npm", "run", "start"]
