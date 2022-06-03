@@ -90,20 +90,25 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
 
       #download the previous task definition to deregister before deploying new task def
-      - name: Download task definition
-        id: download-task
-        run: |
-          aws ecs describe-task-definition \
-            --task-definition ${{ env.ECS_TASK_DEFINITION_NAME }} \
-            --query taskDefinition > task-definition.json
+      # - name: Download task definition
+      #   id: download-task
+      #   run: |
+      # aws ecs describe-task-definition \
+      #       --task-definition ${{ env.ECS_TASK_DEFINITION_NAME }} \
+      #       --query taskDefinition > task-definition.json
 
-          echo "::set-output name=revision::$(($(cat task-definition.json | jq .revision)))"
+      #     echo "::set-output name=revision::$(($(cat task-definition.json | jq .revision)))"
 
-      - name: De-register (latest) revision
-        if: ${{ steps.download-task.outputs.revision }} > 0
+      - name: Stop the previous running task (prev commit)
         run: |
-          aws ecs deregister-task-definition \
-            --task-definition  ${{ env.ECS_TASK_DEFINITION_NAME }}:${{ steps.download-task.outputs.revision }}
+          aws ecs stop-task --cluster ${{env.ECS_CLUSTER}} \
+                --task $(aws ecs list-tasks --cluster ${env.ECS_CLUSTER} --desired-status RUNNING --family ${{env.ECS_TASK_DEFINITION_NAME}} | egrep "task/" | sed -E "s/.*task\/(.*)\"/\1/")
+
+      # - name: De-register (latest) revision
+      #   if: ${{ steps.download-task.outputs.revision }} > 0
+      #   run: |
+      #     aws ecs deregister-task-definition \
+      #       --task-definition  ${{ env.ECS_TASK_DEFINITION_NAME }}:${{ steps.download-task.outputs.revision }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
