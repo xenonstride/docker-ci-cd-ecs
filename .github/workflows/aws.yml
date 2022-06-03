@@ -89,7 +89,7 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
-      #download the previous task definition to deregister after deploying new task def
+      #download the previous task definition to deregister before deploying new task def
       - name: Download task definition
         id: download-task
         run: |
@@ -97,7 +97,13 @@ jobs:
             --task-definition ${{ env.ECS_TASK_DEFINITION_NAME }} \
             --query taskDefinition > task-definition.json
 
-          echo "::set-output name=revision::$(($(cat task-definition.json | jq .revision) - 1))"
+          echo "::set-output name=revision::$(($(cat task-definition.json | jq .revision)))"
+
+      - name: De-register (latest) revision
+        if: ${{ steps.download-task.outputs.revision }} > 0
+        run: |
+          aws ecs deregister-task-definition \
+            --task-definition  ${{ env.ECS_TASK_DEFINITION_NAME }}:${{ steps.download-task.outputs.revision }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
@@ -106,9 +112,3 @@ jobs:
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
-
-      - name: De-register (latest-1) revision
-        if: ${{ steps.download-task.outputs.revision }} > 0
-        run: |
-          aws ecs deregister-task-definition \
-            --task-definition  ${{ env.ECS_SERVICE }}:${{ steps.download-task.outputs.revision }}
