@@ -69,6 +69,13 @@ jobs:
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
 
+      # Stop the previous running tasks before deploying the new task definition
+      - name: Stop the previous running task (prev commit)
+        run: |
+          aws ecs stop-task --cluster ${{env.ECS_CLUSTER}} \
+                --task $(aws ecs list-tasks --cluster ${{env.ECS_CLUSTER}} --desired-status RUNNING --family ${{env.ECS_TASK_DEFINITION_NAME}} | egrep "task/" | sed -E "s/.*task\/(.*)\"/\1/")
+        continue-on-error: true
+
       # deploy the new task definition
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
@@ -77,10 +84,3 @@ jobs:
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: false
-
-      # Stop the previous running tasks before deploying the new task definition
-      - name: Stop the previous running task (prev commit)
-        run: |
-          aws ecs stop-task --cluster ${{env.ECS_CLUSTER}} \
-                --task $(aws ecs list-tasks --cluster ${{env.ECS_CLUSTER}} --desired-status RUNNING --family ${{env.ECS_TASK_DEFINITION_NAME}} | egrep "task/" | sed -E "s/.*task\/(.*)\"/\1/")
-        continue-on-error: true
