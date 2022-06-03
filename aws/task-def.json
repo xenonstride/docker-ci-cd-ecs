@@ -7,7 +7,13 @@
       "environmentFiles": null,
       "logConfiguration": null,
       "entryPoint": null,
-      "portMappings": [],
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "protocol": "tcp",
+          "containerPort": 3000
+        }
+      ],
       "command": null,
       "linuxParameters": null,
       "cpu": 0,
@@ -23,7 +29,7 @@
       "memoryReservation": 300,
       "volumesFrom": [],
       "stopTimeout": null,
-      "image": "217836294118.dkr.ecr.ap-south-1.amazonaws.com/docker-test",
+      "image": "217836294118.dkr.ecr.ap-south-1.amazonaws.com/docker-test:75a243bcfb6945a5b2dfbeee1fcda2ccf3103272",
       "startTimeout": null,
       "firelensConfiguration": null,
       "dependsOn": null,
@@ -47,7 +53,7 @@
   "memory": null,
   "taskRoleArn": null,
   "compatibilities": ["EXTERNAL", "EC2"],
-  "taskDefinitionArn": "arn:aws:ecs:ap-south-1:217836294118:task-definition/my-test-task-definition:1",
+  "taskDefinitionArn": "arn:aws:ecs:ap-south-1:217836294118:task-definition/my-test-task-definition:3",
   "family": "my-test-task-definition",
   "requiresAttributes": [
     {
@@ -68,7 +74,7 @@
   "networkMode": null,
   "runtimePlatform": null,
   "cpu": null,
-  "revision": 1,
+  "revision": 3,
   "status": "ACTIVE",
   "inferenceAccelerators": null,
   "proxyConfiguration": null,
