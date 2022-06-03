@@ -102,7 +102,7 @@ jobs:
       - name: Stop the previous running task (prev commit)
         run: |
           aws ecs stop-task --cluster ${{env.ECS_CLUSTER}} \
-                --task $(aws ecs list-tasks --cluster ${env.ECS_CLUSTER} --desired-status RUNNING --family ${{env.ECS_TASK_DEFINITION_NAME}} | egrep "task/" | sed -E "s/.*task\/(.*)\"/\1/")
+                --task $(aws ecs list-tasks --cluster ${{env.ECS_CLUSTER}} --desired-status RUNNING --family ${{env.ECS_TASK_DEFINITION_NAME}} | egrep "task/" | sed -E "s/.*task\/(.*)\"/\1/")
 
       # - name: De-register (latest) revision
       #   if: ${{ steps.download-task.outputs.revision }} > 0
