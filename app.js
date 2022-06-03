@@ -5,7 +5,7 @@ const morgan = require("morgan");
 app.use(morgan("dev"));
 
 app.get("/", (req, res) => {
-  res.send("<h1>Github CI/CD with AWS ECS,ECR</h1>");
+  res.send("<h1>Github CI/CD with AWS ECS</h1>");
 });
 
 app.listen(3000, () => {
